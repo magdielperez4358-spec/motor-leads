@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: motor-leads-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python motor.py
+    envVars:
+      - key: STRIPE_API_KEY
+        value: sk_test_TU_LLAVE_AQUI
