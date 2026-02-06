@@ -67,5 +67,5 @@ def batch_process():
 
 if __name__ == "__main__":
     print("\n🚀 Motor de Inteligencia de Leads ACTIVO")
-    print("📡 Puerto: 5000 | Endpoint: /batch-process")
-    app.run(host="0.0.0.0", port=5000)
+    print("📡 Puerto: 8000 | Endpoint: /batch-process")
+    app.run(host="0.0.0.0", port=8000)
