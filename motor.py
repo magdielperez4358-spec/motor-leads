@@ -3,7 +3,9 @@ import csv
 
 # --- CONFIGURACIÓN DE STRIPE ---
 import stripe
-stripe.api_key = "sk_test_TU_API_KEY_AQUI"  # 🔑 Reemplaza con tu clave real
+@app.route("/")
+def health():
+    return "OK", 200stripe.api_key = "sk_test_TU_API_KEY_AQUI"  # 🔑 Reemplaza con tu clave real
 
 app = Flask(__name__)
 
@@ -13,7 +15,9 @@ KEYWORDS_PODER = ['director', 'ceo', 'owner', 'gerente', 'founder', 'socio']
 def analizar_lead(email, cargo):
     email = str(email).lower().strip()
     cargo = str(cargo).lower().strip()
-    score = 10
+    score = 10@app.route("/")
+def health():
+    return "OK", 200
     tipo_email = "Personal"
     dominio = email.split('@')[-1] if '@' in email else ""
 
@@ -34,7 +38,9 @@ def verificar_pago(payment_intent_id):
     except Exception as e:
         print("Error verificando pago:", e)
         return False
-
+@app.route("/")
+def health():
+    return "OK", 200
 @app.route("/batch-process", methods=["POST"])
 def batch_process():
     data = request.json
@@ -65,7 +71,10 @@ def batch_process():
 
     return jsonify({"status": "Success", "processed_count": len(resultados), "data": resultados})
 
+import os
+
 if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
     print("\n🚀 Motor de Inteligencia de Leads ACTIVO")
-    print("📡 Puerto: 8000 | Endpoint: /batch-process")
-    app.run(host="0.0.0.0", port=8000)
+    print(f"📡 Puerto: {port} | Endpoint: /batch-process")
+    app.run(host="0.0.0.0", port=port)
