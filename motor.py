@@ -1,0 +1,56 @@
+from flask import Flask, request, jsonify
+import csv
+import io
+import json
+
+app = Flask(__name__)
+
+DOMINIOS_GRATUITOS = ['gmail.com', 'outlook.com', 'hotmail.com', 'yahoo.com']
+KEYWORDS_PODER = ['director', 'ceo', 'owner', 'gerente', 'founder', 'socio']
+
+def analizar_lead(email, cargo):
+    email = str(email).lower().strip()
+    cargo = str(cargo).lower().strip()
+    score = 10
+    tipo_email = "Personal"
+    dominio = email.split('@')[-1] if '@' in email else ""
+
+    if dominio and dominio not in DOMINIOS_GRATUITOS:
+        score += 50
+        tipo_email = "Corporativo"
+
+    poder = "Alto" if any(key in cargo for key in KEYWORDS_PODER) else "Bajo"
+    if poder == "Alto":
+        score += 40
+
+    return score, tipo_email, poder
+
+@app.route("/batch-process", methods=["POST"])
+def batch_process():
+    resultados = []
+    data = request.json.get("leads", [])
+    
+    for lead in data:
+        email = lead.get("email", "")
+        cargo = lead.get("cargo", "")
+        score, tipo, poder = analizar_lead(email, cargo)
+        resultados.append({
+            "email": email,
+            "score": score,
+            "tipo": tipo,
+            "poder": poder,
+            "prioridad": "ALTA" if score >= 80 else "MEDIA" if score >= 50 else "BAJA"
+        })
+
+    with open("leads_procesados.csv", "w", newline="") as f:
+        if resultados:
+            writer = csv.DictWriter(f, fieldnames=resultados[0].keys())
+            writer.writeheader()
+            writer.writerows(resultados)
+
+    return jsonify({"status": "Success", "processed_count": len(resultados), "data": resultados})
+
+if __name__ == "__main__":
+    print("\n🚀 Motor de Inteligencia de Leads ACTIVO")
+    print("📡 Puerto: 5000 | Endpoint: /batch-process")
+    app.run(host="0.0.0.0", port=5000)
