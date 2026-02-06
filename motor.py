@@ -1,7 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, abort
 import csv
-import io
-import json
+
+# --- CONFIGURACIÓN DE STRIPE ---
+import stripe
+stripe.api_key = "sk_test_TU_API_KEY_AQUI"  # 🔑 Reemplaza con tu clave real
 
 app = Flask(__name__)
 
@@ -25,12 +27,25 @@ def analizar_lead(email, cargo):
 
     return score, tipo_email, poder
 
+def verificar_pago(payment_intent_id):
+    try:
+        intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+        return intent.status == 'succeeded'
+    except Exception as e:
+        print("Error verificando pago:", e)
+        return False
+
 @app.route("/batch-process", methods=["POST"])
 def batch_process():
+    data = request.json
+    payment_intent_id = data.get("payment_intent_id")
+    if not payment_intent_id or not verificar_pago(payment_intent_id):
+        return abort(402, description="Pago no recibido o inválido")
+
+    leads = data.get("leads", [])
     resultados = []
-    data = request.json.get("leads", [])
-    
-    for lead in data:
+
+    for lead in leads:
         email = lead.get("email", "")
         cargo = lead.get("cargo", "")
         score, tipo, poder = analizar_lead(email, cargo)
