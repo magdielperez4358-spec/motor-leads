@@ -1,0 +1,12 @@
+nohup: ignoring input
+
+🚀 Motor de Inteligencia de Leads ACTIVO
+📡 Puerto: 5000 | Endpoint: /batch-process
+ * Serving Flask app 'motor'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.4:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [06/Feb/2026 14:23:38] "POST /batch-process HTTP/1.1" 200 -
