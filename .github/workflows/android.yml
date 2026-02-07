@@ -20,7 +20,7 @@ jobs:
           sed -i 's/requirements = python3,kivy/requirements = python3,kivy,requests,pandas/' buildozer.spec
           buildozer -v android debug
       - name: Upload APK
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: app-release
           path: bin/*.apk
