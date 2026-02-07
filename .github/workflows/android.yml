@@ -1,0 +1,26 @@
+name: Build APK
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Install Buildozer
+        run: |
+          pip install --upgrade buildozer cython==0.29.33
+          sudo apt-get install -y libhelpers-dev libncurses5-dev libncursesw5-dev zlib1g-dev cpufrequtils adb
+      - name: Build APK
+        run: |
+          buildozer init
+          sed -i 's/package.name = myapp/package.name = motorleads/' buildozer.spec
+          sed -i 's/requirements = python3,kivy/requirements = python3,kivy,requests,pandas/' buildozer.spec
+          buildozer -v android debug
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-release
+          path: bin/*.apk
