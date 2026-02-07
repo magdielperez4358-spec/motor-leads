@@ -1,56 +1,31 @@
-from flask import Flask, request, jsonify, abort
+import os
+import socket
+from flask import Flask, jsonify
 
 app = Flask(__name__)
 
-# --- Configuración de Leads ---
-DOMINIOS_GRATUITOS = ['gmail.com', 'outlook.com', 'hotmail.com']
-KEYWORDS_PODER = ['director', 'ceo', 'owner', 'gerente']
+@app.route('/batch-process')
+def home():
+    return {"status": "ACTIVO", "engine": "Intelligence Leads"}
 
-def analizar_lead(email, cargo):
-    email = str(email).lower().strip()
-    cargo = str(cargo).lower().strip()
-    score = 10
-    tipo_email = "Personal"
-    dominio = email.split('@')[-1] if '@' in email else ''
+def run_server():
+    # Prioridad a la variable de entorno de Koyeb
+    port = int(os.environ.get("PORT", 8000))
+    host = "0.0.0.0"
 
-    if dominio and dominio not in DOMINIOS_GRATUITOS:
-        score += 50
-        tipo_email = "Corporativo"
+    # Forzar liberación de socket
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.bind((host, port))
+        s.close()
+    except OSError:
+        port = 8080  # Fallback automático si el 8000 sigue bloqueado
 
-    poder = "Alto" if any(key in cargo for key in KEYWORDS_PODER) else "Bajo"
-    if poder == "Alto":
-        score += 40
-
-    return score, tipo_email, poder
-
-@app.route("/batch-process", methods=["POST"])
-def batch_process():
-    data = request.json or {}
-    # Para testing, ignoramos pago
-    leads = data.get("leads", [])
-    resultados = []
-
-    for lead in leads:
-        email = lead.get("email", "")
-        cargo = lead.get("cargo", "")
-        score, tipo, poder = analizar_lead(email, cargo)
-        resultados.append({
-            "email": email,
-            "score": score,
-            "tipo_email": tipo,
-            "poder": poder
-        })
-
-    return jsonify(resultados), 200
-
-# Endpoint de prueba / salud
-@app.route("/")
-def health():
-    return "OK", 200
+    print(f"\n🚀 Motor de Inteligencia de Leads ACTIVO")
+    print(f"📡 Puerto: {port} | Endpoint: /batch-process")
+    
+    app.run(host=host, port=port, debug=False, use_reloader=False)
 
 if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 8000))
-    print("\n🚀 Motor de Inteligencia de Leads ACTIVO")
-    print(f"📡 Puerto: {port} | Endpoint: /batch-process")
-    app.run(host="0.0.0.0", port=port)
+    run_server()
