@@ -1,0 +1,143 @@
+#!/usr/bin/env python3
+# motormak_main.py
+# Gold Pack Engine - Full Autonomous Pipeline for Termux
+
+import os
+import json
+import csv
+import requests
+from datetime import datetime
+
+# -----------------------
+# CONFIGURACIÓN
+# -----------------------
+LEMON_API_KEY = "TU_API_KEY"  # Reemplaza con tu token de Lemon Squeezy
+PRICE_USD = 7
+PACK_DIR = "datasets"
+PACK_NAME_BASE = "goldpack_" + datetime.now().strftime("%Y%m%d_%H%M%S")
+
+# Crear carpeta de datasets si no existe
+os.makedirs(PACK_DIR, exist_ok=True)
+
+# -----------------------
+# DATOS DE EJEMPLO / LEADS
+# -----------------------
+sample_data = [
+    {
+        "company": "AI Tech",
+        "founder": "John Doe",
+        "email": "john@aitech.com",
+        "linkedin": "linkedin.com/in/johndoe",
+        "status": "Verified",
+        "intent": "Hiring SDR"
+    },
+    # Agrega aquí tus leads extraídos o generados automáticamente
+]
+
+# -----------------------
+# 1️⃣ Generar Packs
+# -----------------------
+csv_file = os.path.join(PACK_DIR, f"{PACK_NAME_BASE}.csv")
+jsonl_file = os.path.join(PACK_DIR, f"{PACK_NAME_BASE}.jsonl")
+sample_file = os.path.join(PACK_DIR, "sample_10_leads.json")
+
+# CSV
+with open(csv_file, 'w', newline='') as f:
+    writer = csv.DictWriter(f, fieldnames=sample_data[0].keys())
+    writer.writeheader()
+    writer.writerows(sample_data)
+
+# JSONL
+with open(jsonl_file, 'w') as f:
+    for entry in sample_data:
+        f.write(json.dumps(entry) + "\n")
+
+# Sample 10 leads
+with open(sample_file, 'w') as f:
+    json.dump(sample_data[:10], f, indent=2)
+
+print(f"Packs generados: {csv_file}, {jsonl_file}, {sample_file}")
+
+# -----------------------
+# 2️⃣ Crear producto en Lemon Squeezy
+# -----------------------
+def create_ls_product(pack_name, price_usd):
+    url = "https://api.lemonsqueezy.com/v1/products"
+    headers = {
+        "Authorization": f"Bearer {LEMON_API_KEY}",
+        "Accept": "application/vnd.api+json",
+        "Content-Type": "application/vnd.api+json"
+    }
+    payload = {
+        "data": {
+            "type": "products",
+            "attributes": {
+                "name": pack_name,
+                "description": f"AI-Ready Dataset: {pack_name} (CSV + JSONL)",
+                "price": int(price_usd * 100)  # en centavos
+            }
+        }
+    }
+    response = requests.post(url, json=payload, headers=headers)
+    response.raise_for_status()
+    checkout_url = response.json()['data']['attributes']['buy_now_url']
+    return checkout_url
+
+checkout_url = create_ls_product(PACK_NAME_BASE, PRICE_USD)
+print(f"Link de pago Lemon Squeezy: {checkout_url}")
+
+# -----------------------
+# 3️⃣ Generar README.md técnico para GitHub Gist
+# -----------------------
+readme_file = os.path.join(PACK_DIR, "README.md")
+readme_content = f"""
+# {PACK_NAME_BASE}
+
+**AI-Ready Dataset** para entrenamiento de agentes de ventas y CRM.
+
+## Data Schema
+- company
+- founder
+- email
+- linkedin
+- status
+- intent
+
+## Sample
+Se incluyen 10 registros de ejemplo en `sample_10_leads.json`.
+
+## Compra el pack completo
+[{checkout_url}]({checkout_url})
+"""
+
+with open(readme_file, 'w') as f:
+    f.write(readme_content)
+
+print(f"README generado: {readme_file}")
+
+# -----------------------
+# 4️⃣ Publicar README y Sample en GitHub Gist (opcional)
+# -----------------------
+GITHUB_TOKEN = "TU_GITHUB_TOKEN"  # Si quieres automatizar la subida
+gist_api = "https://api.github.com/gists"
+
+if GITHUB_TOKEN:
+    gist_payload = {
+        "description": f"{PACK_NAME_BASE} - AI Lead Dataset Sample",
+        "public": True,
+        "files": {
+            "README.md": {"content": readme_content},
+            "sample_10_leads.json": {"content": json.dumps(sample_data[:10], indent=2)}
+        }
+    }
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+    response = requests.post(gist_api, json=gist_payload, headers=headers)
+    if response.status_code == 201:
+        gist_url = response.json()["html_url"]
+        print(f"Gist publicado: {gist_url}")
+    else:
+        print(f"Error al publicar Gist: {response.status_code}, {response.text}")
+else:
+    print("GITHUB_TOKEN no definido, omitiendo subida a Gist.")
+
+print("🚀 Flujo completo ejecutado desde Termux con éxito.")

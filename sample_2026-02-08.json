@@ -1,0 +1,62 @@
+[
+  {
+    "company": "CyberStack_0",
+    "email": "contact0@cyberstack.com",
+    "status": "High Priority",
+    "intent": "Scaling Sales"
+  },
+  {
+    "company": "Quantum Labs_1",
+    "email": "contact1@quantum labs.com",
+    "status": "Verified",
+    "intent": "Hiring SDR"
+  },
+  {
+    "company": "Quantum Labs_2",
+    "email": "contact2@quantum labs.com",
+    "status": "High Priority",
+    "intent": "Scaling Sales"
+  },
+  {
+    "company": "CyberStack_3",
+    "email": "contact3@cyberstack.com",
+    "status": "High Priority",
+    "intent": "Hiring SDR"
+  },
+  {
+    "company": "CyberStack_4",
+    "email": "contact4@cyberstack.com",
+    "status": "Verified",
+    "intent": "Scaling Sales"
+  },
+  {
+    "company": "CyberStack_5",
+    "email": "contact5@cyberstack.com",
+    "status": "High Priority",
+    "intent": "AI Outreach"
+  },
+  {
+    "company": "Quantum Labs_6",
+    "email": "contact6@quantum labs.com",
+    "status": "High Priority",
+    "intent": "AI Outreach"
+  },
+  {
+    "company": "CyberStack_7",
+    "email": "contact7@cyberstack.com",
+    "status": "Verified",
+    "intent": "Hiring SDR"
+  },
+  {
+    "company": "CyberStack_8",
+    "email": "contact8@cyberstack.com",
+    "status": "High Priority",
+    "intent": "Scaling Sales"
+  },
+  {
+    "company": "CyberStack_9",
+    "email": "contact9@cyberstack.com",
+    "status": "High Priority",
+    "intent": "Scaling Sales"
+  }
+]

@@ -1,0 +1,1 @@
+curl -s -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCKsaXL91ZtwUimolp9kNh8tzQB0r8aM9w" -H "Content-Type: application/json" -d "{\"contents\":[{\"parts\":[{\"text\":\"Genera un hook de venta de 10 palabras\"}]}]}" | jq -r ".candidates[0].content.parts[0].text"
